@@ -1,6 +1,6 @@
 import axios from "axios";
  const axiosClient=axios.create({
-    baseURL: "http://localhost:3000/api/order",
+    baseURL: `${import.meta.env.VITE_API_URL}/order`,
     headers: {
         "Content-Type": "application/json",
     },

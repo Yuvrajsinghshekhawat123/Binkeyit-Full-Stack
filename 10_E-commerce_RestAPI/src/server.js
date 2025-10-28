@@ -38,7 +38,7 @@ async function startServer() {
     app.use("/api/admin",userSubCategoryRouter)
     app.use("/api/admin",userUploadProductRouter);
     app.use("/api/cart",userCartproductRouter);
-    app.use("/app/address",userAddressRouter);
+    app.use("/api/address",userAddressRouter);
     app.use("/api/order",userProductOrderRouter)
 
     app.listen(3000,()=>{
