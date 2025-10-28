@@ -1,0 +1,43 @@
+ /* src/index.css */
+
+ /* Then import Google Fonts */
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+/* First import Tailwind base styles */
+@import "tailwindcss";
+
+
+/* Now add other styles */
+body {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+  @apply bg-blue-50;
+}
+
+
+
+
+
+
+ .no-scrollbar {
+  -ms-overflow-style: none; /* Hide scrollbar in old Microsoft browsers */
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+  -webkit-overflow-scrolling: touch; /* Enables smooth "momentum" scrolling on iPhones/iPads */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in Chrome, Safari, Edge, Opera */
+}
+
+
+
+
+
+ /* index.css */
+ @media (min-width: 350px) and (max-width: 700px) {
+   .xs\:w-full { width: 57%; };
+   .xs\:text-14px {
+    font-size: 13px;
+  }
+}
+
