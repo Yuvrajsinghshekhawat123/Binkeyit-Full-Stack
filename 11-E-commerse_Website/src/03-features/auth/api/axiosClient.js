@@ -17,7 +17,7 @@ axiosClient.interceptors.response.use(
         const status = error.response?.status;
 
                 // ⛔ Prevent infinite loop on login page
-        if (window.location.pathname === '/login') {
+        if (window.location.pathname === '/') {
             return Promise.reject(error);
         }
         /*
@@ -32,7 +32,7 @@ axiosClient.interceptors.response.use(
         // 401 → Unauthorized (redirect to login)
         if (status === 401) {
             console.log("Unauthorized, redirecting to login");
-            window.location.href = "/login";
+            window.location.href = "/";
             return Promise.reject(error);
         }
 

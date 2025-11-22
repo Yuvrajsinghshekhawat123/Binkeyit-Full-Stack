@@ -19,7 +19,7 @@ export function CategoryWiseProductDisplay({ categoryId, categoryName }) {
   // 👉 Scroll Handlers
   function handleScrollRight() {
     containRef.current.scrollBy({
-      left: containRef.current.clientWidth-80,
+      left: containRef.current.clientWidth - 80,
       behavior: "smooth",
     });
   }
@@ -61,33 +61,21 @@ export function CategoryWiseProductDisplay({ categoryId, categoryName }) {
     });
   }, [categoryId]);
 
+  const { subCategories } = useSelector((state) => state.catalog);
 
-
-
-
-
-
-
-
-
- const {  subCategories} = useSelector(
-    (state) => state.catalog
-  );
-
-  
   function slugify(str = "") {
     return str
       .replaceAll(", ", "-")
-       
+
       .replaceAll(" ", "-")
       .toLowerCase(); // optional: lowercase for cleaner URLs
   }
 
   function handleRedirectProductListPage() {
-     
-
     // Returns the first element that matches. If no match → returns undefined.
-    const subCategory = subCategories?.find((sub) => sub.categoryId === categoryId);
+    const subCategory = subCategories?.find(
+      (sub) => sub.categoryId === categoryId
+    );
 
     // we are doing this for defult products
 
@@ -96,8 +84,6 @@ export function CategoryWiseProductDisplay({ categoryId, categoryName }) {
     )}-${subCategory.id}`;
     navigate(url);
   }
-
-
 
   return (
     <section className="relative">
@@ -108,11 +94,18 @@ export function CategoryWiseProductDisplay({ categoryId, categoryName }) {
         </h1>
 
         <Link
-          className="text-sm md:text-2xl text-green-800 hover:text-green-600"
-          onClick={()=>handleRedirectProductListPage()}
-        >
-          See ALL
-        </Link>
+  onClick={() => handleRedirectProductListPage()}
+  className="inline-flex items-center gap-1 px-4 py-2 
+             text-sm md:text-base font-semibold
+             text-green-800 bg-white 
+             rounded-full border border-green-200 
+             shadow hover:bg-green-50 hover:shadow-lg 
+             hover:-translate-y-1 transition-all duration-200"
+>
+  See All
+  <span className="text-lg">→</span>
+</Link>
+
       </div>
 
       {/* Product carousel */}
@@ -124,7 +117,7 @@ export function CategoryWiseProductDisplay({ categoryId, categoryName }) {
         <div className="relative">
           <div
             ref={containRef}
-            className="w-full overflow-x-auto lg:overflow-hidden scroll-smooth no-scrollbar"
+            className="w-full overflow-x-auto lg:overflow-hidden scroll-smooth no-scrollbar "
           >
             <CardProduct products={products} />
           </div>

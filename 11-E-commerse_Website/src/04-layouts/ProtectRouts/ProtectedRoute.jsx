@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { Footer } from "../../02-Components/footer/footer";
 import { NavBar } from "../../02-Components/header/NavBar";
 
-export function ProtectedRoute({ allowedRoles = [], redirectPath = "/login" }) {
+export function ProtectedRoute({ allowedRoles = [], redirectPath = "/" }) {
 
 
 

@@ -1,14 +1,38 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { FaCheckCircle } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../00-app/03-cartSlice";
-import { useLayoutEffect } from "react";
+
+import { useEffect } from "react";
 export default function OrderSuccess() {
   const location = useLocation();
   const { orderId, totalAmt, paymentMethod } = location.state || {};
-  
-  
+  const cartItems = useSelector((state) => state.cart.items) || {};
+
+  const dispatch = useDispatch();
+   useEffect(() => {
+  if (Object.keys(cartItems).length === 0) {
+    
+    console.log(cartItems);  // this will now always be {}
+  } else {
+    dispatch(clearCart());
+  }
+}, [cartItems]); //this effect runs every time cartItems changes.
+
+/*
+Q-1 WHY DOES CART NOT BECOME EMPTY IMMEDIATELY?
+
+ -> Because dispatch(clearCart()) does NOT empty the cart instantly.
+ -> Redux updates the state asynchronously — meaning:
+      ✔ React FIRST finishes the current rendering
+      ✔ THEN Redux updates the state
+      ✔ THEN Redux updates the state
+      ✔ THEN you get the empty cart
+ -> 
+
+*/
+
  
 
   return (
@@ -41,7 +65,7 @@ export default function OrderSuccess() {
         )}
 
         <Link
-          to="/orders"
+          to="/account/orders"
           className="inline-block mt-4 bg-green-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-green-700 transition font-medium"
         >
           View My Orders

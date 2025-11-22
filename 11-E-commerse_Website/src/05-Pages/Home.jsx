@@ -1,22 +1,19 @@
-import banner from "../assets/banner.jpg";
-import banner_mobile from "../assets/banner-mobile.jpg"
+ import HeroBanner from "../Components/Home/herroSection/herro";
 import { Category } from "../Components/Home/category";
+import TrustBadges from "../Components/Home/trustedBadge/truestBadge";
+
 export function Home() {
-  
   return (
     <>
       <section className="lg:mx-8 lg:my-8 mx-2 my-2">
-        <section className={`w-full  min-h-44 bg-gray-300  ${(!banner  &&  !banner_mobile)&&  "h-65 animate-pulse"} rounded-2xl`}>
-          <img src={banner} alt="banner" className="w-full h-full hidden lg:flex" />
-          <img src={banner_mobile} alt="banner" className="w-full min-h-48 lg:hidden " />
-        </section>
 
+        {/*✨ Hero Section (Banner) */}
+        <HeroBanner />
+        <TrustBadges/>
 
-        <Category/>
+        {/* Categories */}
+        <Category />
 
-2
-
-       
       </section>
     </>
   );

@@ -35,7 +35,7 @@ export function CardProduct({ products }) {
   return (
     <>
       <div
-        className="flex  gap-5 w-full z-10"
+        className="flex  gap-5 w-full z-10 "
         style={{ width: "100%" }} // 👈 ensures each page occupies full visible width
       >
         {products.map((product, i) => {
@@ -53,7 +53,8 @@ export function CardProduct({ products }) {
                 handleRedirectSingleProductDetial(product.name, product.id)
               }
               key={product.id || i}
-              className="relative w-[60vw]  h-[45vh] xs:w-full   md:w-[25vw] md:h-[48vh] lg:w-[20vw]  lg:h-[44vh]  xl:w-[17vw] 2xl:w-[14vw] xl:h-auto  flex-shrink-0 font-normal space-y-2 border p-4 shadow-lg border-gray-200 rounded-xl flex flex-col justify-between cursor-pointer"
+              className="relative w-[60vw]  h-[45vh] xs:w-full   md:w-[25vw] md:h-[48vh] lg:w-[20vw]  lg:h-[44vh]  xl:w-[17vw] 2xl:w-[14vw] xl:h-auto  flex-shrink-0 font-normal space-y-2 border p-4 shadow-lg border-gray-200 rounded-xl flex flex-col justify-between cursor-pointer transition-all duration-300 
+      hover:scale-105 hover:-translate-y-1 hover:shadow-xl"
             >
               {/* Discount Badge */}
               {discount > 0 && (

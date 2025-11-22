@@ -15,12 +15,13 @@ import { CartSidebar } from "./addToCart";
 import { useAddCartDetials } from "../../03-features/cart/hook/01-useAddCartDetails";
 import { useGetAllCartProduct } from "../../03-features/cart/hook/02-useGetAllCartProducts";
 import { addToCart, clearCart } from "../../00-app/03-cartSlice";
+import { CiShoppingCart } from "react-icons/ci";
 
 export function NavBar() {
   const location = useLocation(); // means on search page do not show logo and login and add to cart
   const isSearchPage = location.pathname === "/search";
   const userDetail = useSelector((state) => state.userDetail);
-   
+
   const [processing, setProcessing] = useState(false);
 
   // console.log(userDetail.userId);
@@ -48,7 +49,6 @@ export function NavBar() {
   async function handleLogoutButton() {
     logout(undefined, {
       onSuccess: async (data) => {
-         
         setProcessing(false);
         toast.success(data.message);
 
@@ -67,72 +67,38 @@ export function NavBar() {
 
     */
 
-
-
-
-
-
-
   const { mutate: syncCart } = useAddCartDetials();
-  
 
-  const minimalCart = Object.entries(cartItems)
-  .map(([productId, item]) => ({
+  const minimalCart = Object.entries(cartItems).map(([productId, item]) => ({
     productId: Number(productId),
     quantity: item.count,
   }));
-  
-   
 
   // You should call this hook in the component where the cart is updated before the user leaves the website — for example:
-   useEffect(() => {
-     
-  if (userDetail?.userId && Object.keys(cartItems).length >= 0) {
- 
+  useEffect(() => {
+    if (userDetail?.userId && Object.keys(cartItems).length >= 0) {
+      syncCart({ cartItems: minimalCart }); // async, but page is still open
+    }
+  }, [cartItems, userDetail?.userId]);
 
-    syncCart({ cartItems: minimalCart}); // async, but page is still open
-  }
-}, [cartItems, userDetail?.userId])
-
-
-
-
-
-
-
-
-
-const {data,loading}=useGetAllCartProduct();
-useEffect(()=>{
-
-  
-  if (userDetail?.userId &&  data && data.success && data.cartItems) {
-      
+  const { data, loading } = useGetAllCartProduct();
+  useEffect(() => {
+    if (userDetail?.userId && data && data.success && data.cartItems) {
       // Update Redux store with cart items from backend
-       Object.entries(data.cartItems).forEach(([productId,item])=>{
-        dispatch(addToCart({
-           productId: Number(productId),
+      Object.entries(data.cartItems).forEach(([productId, item]) => {
+        dispatch(
+          addToCart({
+            productId: Number(productId),
             name: item.name,
             image: item.image,
             unit: item.unit,
             price: item.price,
             discount: item.discount,
-        }))
-       })
-       
+          })
+        );
+      });
     }
-},[data, dispatch])
-
-
-
-
-
- 
-
-
-
-
-
+  }, [data, dispatch]);
 
   if (processing) {
     return (
@@ -143,31 +109,49 @@ useEffect(()=>{
   }
   return (
     <>
-      <section className="flex  justify-between w-full bg-white  lg:shadow-md font-light  fixed top-0 left-0 z-10 ">
-        <div className="lg:w-[12vw] lg:border-r lg:border-gray-100 ">
+       <section className="flex justify-between w-full 
+    backdrop-blur-lg bg-white/30 
+    
+    lg:shadow-md font-light 
+    fixed top-0 left-0 z-10 ">
+
+        <div className="lg:w-auto lg:border-r lg:border-gray-100 ">
           {!isSearchPage && (
-            <div className="  h-full lg:mx-0 flex justify-start items-center hover:bg-gray-50 p-2">
-              <Link to="/">
-                <img src={logo} alt="logo" className="h-12  object-contain " />
+            <div className="h-full lg:mx-0 flex justify-start items-center hover:bg-gray-50 p-2">
+              <Link to="/" className="flex items-center gap-2">
+                {/* Icon box */}
+                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-green-500 shadow-md">
+                  <MdOutlineShoppingCart className="h-6 w-6 text-white animate-bounce" />
+                </div>
+
+                {/* Brand name */}
+                <span className="text-2xl font-bold text-green-600">
+                  FreshCart
+                </span>
               </Link>
             </div>
           )}
+
           {/* Logo */}
 
           {/* on lg screen on search page show the  "add to cart" button */}
           {isSearchPage && (
             <div className="hidden lg:flex lg:items-center h-full hover:bg-gray-50 p-4">
-              <Link to="/">
-                <img
-                  src={logo}
-                  alt="logo"
-                  className="w-[12vw]  h-12 object-contain  "
-                />
+              <Link to="/" className="flex items-center gap-2">
+                {/* Icon box */}
+                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-green-500 shadow-md">
+                  <MdOutlineShoppingCart className="h-6 w-6 text-white animate-bounce" />
+                </div>
+
+                {/* Brand name */}
+                <span className="text-2xl font-bold text-green-600">
+                  FreshCart
+                </span>
               </Link>
             </div>
           )}
         </div>
-        <div className="flex justify-between items-center w-full p-4 px-6 h-auto bg-white   font-light relative ">
+        <div className="flex justify-between items-center w-full p-4 px-6 h-auto   font-light relative ">
           <div></div>
 
           {/* search item */}
@@ -193,7 +177,9 @@ useEffect(()=>{
                     isActive ? "underline text-blue-600 text-xl" : "text-xl"
                   }
                 >
-                  Login
+                  <span className="font-normal hover:text-blue-600  ">
+                    Login
+                  </span>
                 </NavLink>
               )}
 
@@ -220,7 +206,7 @@ useEffect(()=>{
 
                   {/* Dropdown */}
                   <div
-                    className={` text-md  w-[17%]  absolute right-80 flex flex-col items-start   bg-white shadow-md rounded-sm p-3 transform transition-all duration-300 ease-in-out origin-top ${
+                    className={` text-md  w-[17%]  absolute right-80 flex flex-col items-start  bg-white shadow-md rounded-sm p-3 transform transition-all duration-300 ease-in-out origin-top ${
                       openUserManu
                         ? "opacity-100 translate-y-4 scale-y-100"
                         : "opacity-0 -translate-y-2 scale-y-0"
@@ -246,25 +232,61 @@ useEffect(()=>{
                       <div className="h-0.5 w-full bg-gray-200 dark:bg-gray-300"></div>
                     </div>
 
+                    {userDetail?.role === "user" ? (
+                      <>
+                        <div className="w-full text-gray-600 font-normal p-2">
+                          <button
+                            onClick={() => setOpenUserManu(false)}
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                          >
+                            <Link to="/account/orders">My Orders</Link>
+                          </button>
+                        </div>
+                        <div className="w-full text-gray-600 font-normal p-2">
+                          <button
+                            onClick={() => setOpenUserManu(false)}
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                          >
+                            <Link to="/account/addresses">Saved Addresses</Link>
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-full text-gray-600 font-normal p-2">
+                          <button
+                            onClick={() => setOpenUserManu(false)}
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                          >
+                            <Link to="/account/admin/category">Category</Link>
+                          </button>
+                        </div>
+                        <div className="w-full text-gray-600 font-normal p-2">
+                          <button
+                            onClick={() => setOpenUserManu(false)}
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                          >
+                            <Link to="/account/admin/sub-category">
+                              Sub Category
+                            </Link>
+                          </button>
+                        </div>
+
+                        <div className="w-full text-gray-600 font-normal p-2">
+                          <button
+                            onClick={() => setOpenUserManu(false)}
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                          >
+                            <Link to="/account/admin/upload-products">
+                              Upload Products
+                            </Link>
+                          </button>
+                        </div>
+                      </>
+                    )}
                     <div className="w-full text-gray-600 font-normal p-2">
                       <button
-                        onClick={() => setOpenUserManu(false)}
-                        className="hover:bg-gray-200 cursor-pointer w-full text-left"
-                      >
-                        <Link to="/account/orders">My Orders</Link>
-                      </button>
-                    </div>
-                    <div className="w-full text-gray-600 font-normal p-2">
-                      <button
-                        onClick={() => setOpenUserManu(false)}
-                        className="hover:bg-gray-200 cursor-pointer w-full text-left"
-                      >
-                        <Link to="/account/addresses">Saved Addresses</Link>
-                      </button>
-                    </div>
-                    <div className="w-full text-gray-600 font-normal p-2">
-                      <button
-                        className="hover:bg-gray-200 cursor-pointer w-full text-left"
+                        className="hover:bg-gray-200 cursor-pointer w-full text-left "
                         onClick={handleLogoutButton}
                       >
                         Log Out
@@ -323,11 +345,11 @@ useEffect(()=>{
           {/* on lg screen on search page show the  "add to cart" button */}
           {isSearchPage && (
             <div
-              className="hidden lg:flex"
+              className="hidden lg:flex "
               onClick={() => setShowSideBar((prev) => !prev)}
             >
               <button
-                className=" w-30 h-12 bg-green-700 rounded-lg flex items-center gap-2 p-1 text-white text-sm font-bold disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                className=" w-30 h-12 bg-green-700 rounded-lg flex items-center gap-2 p-1 text-white text-sm font-bold disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer "
                 disabled={totalItems <= 0}
               >
                 <MdOutlineShoppingCart className="text-2xl animate-bounce" />
@@ -387,13 +409,15 @@ useEffect(()=>{
       </section>
 
       {!isSearchPage && (
-        <div className="lg:hidden pb-2 bg-white shadow-md w-[100%] fixed top-15 z-10">
+        <div className="lg:hidden pb-2 w-[100%] fixed top-14 z-10 backdrop-blur-md bg-white/20  shadow-md ">
           <Search />
         </div>
       )}
 
       {isSearchPage && (
-        <div className="md:hidden pb-2 bg-white shadow-md w-[100%] fixed top-5 z-10">
+         <div className="md:hidden  pb-2  w-full fixed top-5 z-10
+     backdrop-blur-md bg-white/20  shadow-xl">
+
           <Search />
         </div>
       )}
@@ -404,14 +428,14 @@ useEffect(()=>{
         <>
           {/* Overlay (dark background) */}
           <div
-            className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 "
             onClick={() => setShowSideBar(false)}
           ></div>
 
           <div
-            className={`fixed top-0 right-0 h-full
+            className={`fixed top-0 right-0 h-full bg-white
   w-full sm:w-[430px] md:w-[400px] 
-  bg-white shadow-2xl z-50 
+  shadow-2xl z-50 
   transform transition-transform duration-300 ease-in-out 
   ${showSideBar ? "translate-x-0" : "translate-x-full"}`}
           >
@@ -423,25 +447,35 @@ useEffect(()=>{
       {/* show add to cart button on sm,md only on dowon side */}
       {!showSideBar ? (
         <div
-          className="fixed bottom-0 left-0 right-0 px-4 lg:hidden z-50 font-normal bg-white border-t border-gray-200
- "  
+          className="fixed bottom-0 left-0 right-0 px-4 lg:hidden z-50 font-normal border-t border-gray-200
+ "
           onClick={() => setShowSideBar((prev) => !prev)}
         >
-          <button className="w-full flex justify-between items-center bg-green-600 text-white rounded-xl py-3 px-4 shadow-md active:scale-95 transition-transform duration-200 disabled:cursor-not-allowed disabled:opacity-30" disabled={totalItems <= 0}>
+          <button
+            className="w-full flex justify-between items-center bg-green-600 text-white rounded-xl py-3 px-4 shadow-md active:scale-95 transition-transform duration-200 disabled:cursor-not-allowed disabled:opacity-70"
+            disabled={totalItems <= 0}
+          >
             {/* Left Side: Cart + Item Details */}
             <div className="flex items-center gap-3">
               <div className="relative">
                 <MdOutlineShoppingCart className="text-2xl animate-bounce" />
               </div>
-              <div className="text-left leading-tight">
-                <p className="font-semibold text-sm">{totalItems} items</p>
-                <p className="text-xs opacity-90">₹{totalPrice}</p>
-              </div>
+              {totalItems > 0 ? (
+                <>
+                  {" "}
+                  <div className="text-left leading-tight">
+                    <p className="font-semibold text-sm">{totalItems} items</p>
+                    <p className="text-xs opacity-90">₹{totalPrice}</p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-gray-300">My Cart</p>
+              )}
             </div>
 
             {/* Right Side: View Cart */}
-            <p className="font-semibold text-sm bg-white text-green-700 rounded-lg px-3 py-1">
-              View Cart {totalItems}
+            <p className="font-semibold text-sm text-green-700 rounded-lg px-3 py-1">
+              View Cart
             </p>
           </button>
         </div>

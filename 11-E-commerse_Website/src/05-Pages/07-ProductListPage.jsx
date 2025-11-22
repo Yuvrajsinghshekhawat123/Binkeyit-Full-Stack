@@ -134,7 +134,7 @@ export function ProductListpage() {
   return (
     <>
       <section className="flex justify-center w-full mb-20 ">
-        <section className="w-[80vw] min-h-screen  bg-white shadow-2xl">
+        <section className="w-[80vw]   bg-white shadow-2xl">
           {/* sub-categroy header name */}
           <section className="w-full h-[5vh]  border border-gray-200 font-semibold flex items-center px-4 text-sm ">
             Buy {subCategoryName}Online
@@ -269,7 +269,7 @@ export function ProductListpage() {
 
             {/*  for detilas  */}
           </section>
-          <section className="h-[20vh] w-full bg-amber-900"> </section>
+           
         </section>
       </section>
     </>

@@ -318,8 +318,7 @@ export function SingleProductPage() {
         </section>
       </section>
 
-      {/* Demo filler for bottom content */}
-      <section className="h-[40vh] sm:h-[60vh] bg-amber-500"></section>
+      
     </>
   );
 }

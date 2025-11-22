@@ -222,7 +222,7 @@ export async function LoginUser(req, res) {
     const isMatch = await argon2.verify(user.password, password);
     if (!isMatch) {
       return res
-        .status(401)
+        .status(404)
         .json({ success: false, message: "Invalid password" });
     }
 
@@ -323,12 +323,15 @@ export async function uploadAvatar(req, res) {
       }
     }
 
+    
+
     return res.status(201).json({
       success: true,
       data: { userId: req.userId, avatar: upload.url },
       message: "file upload Successfully",
     });
   } catch (err) {
+    console.log(err)
     return res.status(500).json({ success: false, message: err.message });
   }
 }

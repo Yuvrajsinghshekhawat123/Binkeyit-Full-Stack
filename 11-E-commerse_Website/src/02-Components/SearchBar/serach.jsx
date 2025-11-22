@@ -52,12 +52,12 @@ export function Search() {
 
 
   return (
-    <div className="flex items-center justify-center font-light">
+    <div className="flex items-center justify-center font-light ">
 
         {/* show back button on search page instead of seach icon  on mobile,sm,md */}
        {/* Show search icon normally on all page except*/}
         { !location.pathname.startsWith("/account") && !isSearchPage && (
-                    <div className="p-2 border-2 border-black rounded-lg rounded-r-none ">
+                    <div className="p-2 border-2 border-black rounded-lg rounded-r-none backdrop-blur-md bg-white/50 sticky top-0 ">
                         <IoSearch className="w-5" />
                     </div>
           )}
@@ -65,13 +65,13 @@ export function Search() {
           {
             //  /* On small screen → show back button */
             location.pathname.startsWith("/account") && !isSearchPage && (<>
-                    <div className="p-1 border-2 border-black rounded-lg rounded-r-none block lg:hidden">
+                    <div className="p-1 border-2 border-black rounded-lg rounded-r-none block lg:hidden backdrop-blur-md bg-white/50 sticky top-0">
                         <button onClick={()=>navigate(-1)}>
                         <IoMdArrowRoundBack className="w-5" />
                         </button>
                     </div>
              {/* On medium+ screens → keep search */ }
-              <div className="p-2 border-2 border-black rounded-lg rounded-r-none hidden lg:flex">
+              <div className="p-2 border-2 border-black rounded-lg rounded-r-none hidden lg:flex backdrop-blur-md bg-white/50 sticky top-0">
                         <IoSearch className="w-5" />
                 </div>
                 </>
@@ -84,7 +84,7 @@ export function Search() {
 
         {/* Show back button only on mobile/sm/md */}
         {isSearchPage && (
-        <div className="p-2 border-2 border-black rounded-lg rounded-r-none block lg:hidden">
+        <div className="p-2 border-2 border-black rounded-lg rounded-r-none block lg:hidden backdrop-blur-md bg-white/50 sticky top-0">
             <Link to="/">
             <IoMdArrowRoundBack className="w-5" />
             </Link>
@@ -95,7 +95,7 @@ export function Search() {
 
         {/* Show search icon only on lg on sreach page */ }
          {isSearchPage && (
-        <div className="p-2 border-2 border-black rounded-lg rounded-r-none hidden lg:flex">
+        <div className="p-2 border-2 border-black rounded-lg rounded-r-none hidden lg:flex backdrop-blur-md bg-white/50 sticky top-0">
             <IoSearch className="w-5" />
         </div>
         )}
@@ -113,7 +113,7 @@ export function Search() {
           onBlur={() => setIsFocused(false)}
           onClick={redirectToSearchPage}
 
-          className=" w-[80vw] sm:w-[40vw] md:w-[90vw] lg:w-[30vw] h-6 p-4 rounded-lg rounded-l-none border-2 border-black border-l-0 outline-none placeholder:text-gray-700 "
+          className=" w-[80vw] sm:w-[40vw] md:w-[90vw] lg:w-[30vw] h-6 p-4 rounded-lg rounded-l-none border-2 border-black border-l-0 backdrop-blur-md bg-white/50 sticky top-0 outline-none placeholder:text-gray-700 "
 
         />
 

@@ -96,6 +96,14 @@ export function Category() {
 
   return (
     <section>
+
+       <div className="text-center mb-10 font-normal mt-25">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Shop by Category</h2>
+        <p className="text-muted-foreground text-lg">Browse through our wide selection of products</p>
+      </div>
+
+
+
       <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-10 justify-items-center gap-2 md:gap-5 w-full px-3 py-3 md:px-8 lg:px-4  ">
         {isLoading
           ? Array.from({ length: 20 }).map((_, i) => (
@@ -117,7 +125,8 @@ export function Category() {
                 <img
                   src={cat.image}
                   alt="category"
-                  className="w-[30vw] h-[25vh] "
+                  className="w-[30vw] h-[25vh] rounded-2xl  transition-all duration-300 
+      hover:scale-105 hover:-translate-y-1 hover:shadow-xl"
                 />
               </div>
             ))}

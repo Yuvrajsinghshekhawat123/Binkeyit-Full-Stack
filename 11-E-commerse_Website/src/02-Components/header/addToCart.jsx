@@ -38,6 +38,9 @@ const userDetail = useSelector((state) => state.userDetail);
 
   const grandTotal = itemsTotal - savedAmount + handlingCharge;
 
+  if(totalItems <=0){
+    setShowSideBar(false);
+  }
   return (
     <div className="w-full max-w-sm bg-white p-4 shadow-[ -6px_0_15px_rgba(0,0,0,0.2) ]  rounded-lg font-normal max-h-[610px]  lg:max-h-[810px] xl:max-h-full 2xl:max-h-[870px] overflow-y-auto ">
       <div className="flex justify-between">

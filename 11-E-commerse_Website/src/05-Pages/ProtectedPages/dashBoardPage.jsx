@@ -38,6 +38,7 @@ export function Dashboard() {
         dispatch(clearUserDetails());
         dispatch(clearCart());
         queryClient.invalidateQueries({ queryKey: ["userDetails"] });
+        
       },
       onError: (error) => {
         toast.error(error.message || "Logout failed");

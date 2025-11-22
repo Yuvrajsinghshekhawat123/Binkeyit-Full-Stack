@@ -70,7 +70,7 @@ export function Login() {
  
 
                 // ✅ Navigate after the data is definitely loaded
-                navigate('/account', { replace: true });
+                navigate('/', { replace: true });
 
                                 
                      

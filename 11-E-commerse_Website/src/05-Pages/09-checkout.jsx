@@ -65,9 +65,17 @@ export function Checkout() {
   const [addAddress, setAddAddress] = useState(false);
   const [newAddress, setNewAddress] = useState("");
 
-  const handleSelect = (id) => {
-    setSelectedAddress((prev) => (prev == id ? null : id));
-  };
+   const handleSelect = (id) => {
+  if (selectedAddress === id) {
+    // click again → unselect
+    setSelectedAddress(null);
+ 
+  } else {
+    // first click → select
+    setSelectedAddress(id);
+  }
+};
+
 
   const { mutate: deleteAddress } = useDeleteAddress();
   const [deleteAddressLoadingId, setDeleteAddressLoadingId] = useState(null);
@@ -119,7 +127,7 @@ export function Checkout() {
     setCODLoading(true);
     cod(formData, {
       onSuccess: (data) => {
-        dispatch(clearCart());
+        
         navigate("/success", { replace: true });
 
         setCODLoading(false);
@@ -162,9 +170,10 @@ async function handleOnlinePayment() {
 
   OnlinePayment(payload, {
     onSuccess: (data) => {
-      dispatch(clearCart());
+       
       // Redirect to Stripe-hosted checkout page
-      window.location.href = data.url;
+       window.location.replace(data.url);
+
     },
     onError: (err) => {
       console.error("Online payment error:", err);
@@ -209,7 +218,7 @@ async function handleOnlinePayment() {
                     type="radio"
                     name="selectedAddress"
                     checked={selectedAddress === address.id}
-                    onChange={() => handleSelect(address.id)}
+                    onClick={() => handleSelect(address.id)}
                     className="accent-green-600"
                   />
                   <div className="text-gray-700 text-sm leading-6">
@@ -355,6 +364,9 @@ async function handleOnlinePayment() {
                 )}
               </button>
             </div>
+
+             
+
             <div className=" ">
               <button
                 onClick={handleCOD}
@@ -371,12 +383,13 @@ async function handleOnlinePayment() {
                 )}
               </button>
 
-              {selectedAddress == null && (
-                <div className="absolute -top-10 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-red-100 text-red-700 text-sm px-3 py-1 rounded-lg">
-                  Please select the address
+              
+            </div>
+             {selectedAddress == null && (
+                <div className="absolute top-13  opacity-0 group-hover:opacity-100 transition-opacity duration-300   text-red-500 text-sm px-3 py-1 rounded-lg w-full flex justify-end ">
+                   <div className="w-fit bg-red-100 px-2 rounded-2xl">Please select the address</div>
                 </div>
               )}
-            </div>
           </div>
         </section>
       </section>
