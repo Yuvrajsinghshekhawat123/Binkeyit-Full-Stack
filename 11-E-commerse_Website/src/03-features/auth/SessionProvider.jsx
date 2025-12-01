@@ -1,4 +1,4 @@
- import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useLoginUserDetails } from "./hook/useLogin";
 import { useEffect, useState } from "react";
 import { clearUserDetails, setUserDetails } from "../../00-app/01-userSlice";
@@ -49,8 +49,7 @@ useEffect(() => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <ClipLoader color="#2563eb" loading size={40} />
-      </div>
-    );
+      </div>    );
   }
 
   return children;

@@ -12,6 +12,13 @@ import {getDB} from "../01-config/connectDB.js"
     [name, email, passwordHash, token, expiresAt, passwordHash, token, expiresAt]
   );
 }
+/*
+⭐ 2. When is ON DUPLICATE KEY UPDATE needed?
+    It is needed ONLY when you want behavior like:
+    Same user can request OTP again
+    Same user can update their token
+    Same user can resend verification email
+*/
 
 
 // find eamil

@@ -53,6 +53,7 @@ const cartSlice = createSlice({
 
     clearCart: (state) => {
       state.items = {};
+      localStorage.removeItem("cart");   // ⭐ FIX
     },
   },
 });

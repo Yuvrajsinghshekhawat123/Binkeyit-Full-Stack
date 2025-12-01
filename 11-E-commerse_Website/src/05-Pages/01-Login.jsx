@@ -8,9 +8,11 @@ import { loginSchema } from "../06-ZodValidation/loginSchema";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { useQueryClient } from "@tanstack/react-query";
+import { GoogleLoginButton } from "../Components/02-GoogleLogin/googleLogin";
  
 
 export function Login() {
+    
     const [formdata, setformData] = useState({
         email: "",
         password: "",
@@ -192,6 +194,8 @@ export function Login() {
                                 </>
                             ) : "Login"}
                         </button>
+
+                        <GoogleLoginButton />  
                     </div>
 
                     <h1 className="text-center text-gray-500 text-xs sm:text-sm md:text-md lg:text-lg font-normal">

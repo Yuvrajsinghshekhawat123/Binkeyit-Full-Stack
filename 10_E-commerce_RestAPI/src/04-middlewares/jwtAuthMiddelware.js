@@ -90,5 +90,24 @@ async function handleExpiredAccessToken(req,res,next,oldRefreshToken) {
 }
 
 
+
+/*
+
+2. When access token expires(Refresh Token Rotation (Best Practice))
+
+    Verify refresh token
+    DO NOT store old refresh token again
+    Rotate the refresh token → issue a NEW refresh token
+*/
+
+
+/*
+🟢 CASE 1 — Refresh token on client is NOT expired
+    👉 Client always stores and uses the latest refresh token only.
+👉 Old refresh token is deleted by browser when new one is set.
+
+*/
+
+
  
  

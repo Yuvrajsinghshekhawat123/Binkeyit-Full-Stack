@@ -10,6 +10,7 @@ import { userUploadProductRouter } from "./05-routes/04-uploadProduct.js";
 import { userCartproductRouter } from "./05-routes/05-cartProduct.js";
 import { userAddressRouter } from "./05-routes/06-Address.js";
 import { userProductOrderRouter } from "./05-routes/07-order.js";
+import { trackOrderRouter } from "./05-routes/08-trackOrder.js";
 
 const  app=express();
 
@@ -40,6 +41,9 @@ async function startServer() {
     app.use("/api/cart",userCartproductRouter);
     app.use("/api/address",userAddressRouter);
     app.use("/api/order",userProductOrderRouter)
+    app.use("/api/order",userProductOrderRouter)
+    app.use("/api/order/fedex",trackOrderRouter);
+    
 
     app.listen(3000,()=>{
         console.log("🚀 Server is running on port 3000");

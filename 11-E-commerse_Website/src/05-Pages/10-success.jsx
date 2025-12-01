@@ -5,20 +5,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../00-app/03-cartSlice";
 
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 export default function OrderSuccess() {
   const location = useLocation();
   const { orderId, totalAmt, paymentMethod } = location.state || {};
   const cartItems = useSelector((state) => state.cart.items) || {};
 
   const dispatch = useDispatch();
-   useEffect(() => {
-  if (Object.keys(cartItems).length === 0) {
+    const queryClient = useQueryClient(); // ⭐
+
     
-    console.log(cartItems);  // this will now always be {}
-  } else {
-    dispatch(clearCart());
-  }
-}, [cartItems]); //this effect runs every time cartItems changes.
+   useEffect(() => {
+  dispatch(clearCart());
+ 
+  
+}, []);  // run ONLY once when success page loads
 
 /*
 Q-1 WHY DOES CART NOT BECOME EMPTY IMMEDIATELY?

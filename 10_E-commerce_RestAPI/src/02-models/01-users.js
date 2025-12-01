@@ -15,16 +15,30 @@ export async function findUserByEmail(email){
     return row;
 }
 
+
+
+
 // find user by id
 export async function findUserById(id){
     const db=getDB();
     const [row]=await db.execute(`
         select * from users where id=?
-    `,[id]);
+        `,[id]);
+        
+        return row;
+    }
+    
+    
+     export async function createGoogleUser(name, email, is_verified = true) {
+  const db = getDB();
 
-    return row;
+  const [result] = await db.execute(
+    "INSERT INTO users (name, email, verify_email) VALUES (?, ?, ?)",
+    [name, email, is_verified]
+  );
+
+  return  result.insertId;
 }
-
 
 
 // insert user detils

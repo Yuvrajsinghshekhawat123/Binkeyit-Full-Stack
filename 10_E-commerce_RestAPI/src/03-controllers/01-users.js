@@ -1,6 +1,7 @@
 import argon2 from "argon2";
 import {
   ChangeUserPassword,
+  createGoogleUser,
   createUser,
   DeleteAvatarUrl,
   findUserByEmail,
@@ -38,6 +39,8 @@ import {
 } from "../02-models/forgot_password.js";
 import { sendResetPasswordVerificationCode } from "../07-ResendApi/resetPassword/sendResetPasswordVerificationCode.js";
 import cloudinary from "../06-utils/cloudinary/cloudinary.js";
+import { oauth2client } from "../06-utils/googleConfig.js";
+import { google } from "googleapis";
 
 export async function registerUser(req, res) {
   try {
@@ -112,7 +115,7 @@ export async function verifiyEmail(req, res) {
     }
 
     // check if token is expired or not
-    const now = new Date();
+    const now = Date.now();
     if (!record[0].expiresAt || new Date(record[0].expiresAt).getTime() < now) {
       return res
         .status(400)
@@ -161,6 +164,8 @@ export async function ResendCode(req, res) {
         .json({ success: false, message: "Verification record not found" });
     }
 
+
+      
     //3.  generate a 6 digit token
     const token = crypto.randomInt(100000, 999999).toString();
     const hashedToken = await argon2.hash(token);
@@ -197,40 +202,39 @@ export async function ResendCode(req, res) {
 
 // login the user
 
-export async function LoginUser(req, res) {
+ export async function LoginUser(req, res) {
   try {
     const { email, password } = req.body;
 
-    // 1. Check if user exists or not
     const existingUser = await findUserByEmail(email);
+
     if (existingUser.length === 0) {
-      return res
-        .status(409)
-        .json({ success: false, message: "User not found" });
+      return res.status(409).json({ success: false, message: "User not found" });
     }
 
-    const user = existingUser[0]; // get the first row
+    const user = existingUser[0];
 
-    // check if user is active or not
-    if (user.status !== "active") {
-      return res
-        .status(400)
-        .json({ success: false, message: "Contact to Admin" });
+    // ===============================
+    // ⭐ SITUATION 1 — Google Signup → Manual Login Later
+    // password is NULL
+    // ===============================
+    if (user.password === null) {
+      return res.status(400).json({
+        success: false,
+        message: "You signed up using Google. Please login with Google.",
+      });
     }
 
-    // verify the password
+    // Normal manual login
     const isMatch = await argon2.verify(user.password, password);
+
     if (!isMatch) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Invalid password" });
+      return res.status(404).json({ success: false, message: "Invalid password" });
     }
 
-    // set access token and referse token
     const access_Token = setAccessTokenCookies(res, { userId: user.id });
     const refresh_Token = setRefreshTokenCookie(res, { userId: user.id });
 
-    // store the refresh token in session table
     const hashedRefreshToken = await argon2.hash(refresh_Token);
     const userAgent = req.headers["user-agent"] || null;
 
@@ -240,15 +244,15 @@ export async function LoginUser(req, res) {
       userAgent,
       req.clientIp
     );
-
-    // 6. Update last_login_date
     await updateUserById(user.id);
 
     res.status(200).json({ success: true, message: "User login successfully" });
+
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 
 // Login user Details for profile
 export async function LoginUserDetails(req, res) {
@@ -709,5 +713,109 @@ export async function resetPassword(req, res) {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ // google login
+export async function googleLogin(req, res) {
+  try {
+    const { code } = req.body;
+
+    // 1. Exchange code -> tokens
+    const { tokens } = await oauth2client.getToken(code);
+    oauth2client.setCredentials(tokens);
+
+    
+
+    // 2. Get user info from Google
+    const oauth2 = google.oauth2({
+      auth: oauth2client,
+      version: "v2",
+    });
+
+    const { data } = await oauth2.userinfo.get();
+    const { email, name, picture } = data;
+
+    // 3. Check existing user
+    const result = await findUserByEmail(email);
+
+    // ==============================
+    // ⭐ SITUATION 4 — DIFFERENT email (completely new user)
+    // If no user found → create new Google user
+    // ==============================
+    if (result.length === 0) {
+      const newUserId = await createGoogleUser(
+        name,
+        email,
+      );
+
+      // generate tokens
+      const access_Token = setAccessTokenCookies(res, { userId: newUserId });
+      const refresh_Token = setRefreshTokenCookie(res, { userId: newUserId });
+
+      // store refresh token
+      const hashedRefreshToken = await argon2.hash(refresh_Token);
+      const userAgent = req.headers["user-agent"] || null;
+
+      await insertUserSessionRecord(
+        newUserId,
+        hashedRefreshToken,
+        userAgent,
+        req.clientIp
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Google user created & logged in",
+      });
+    }
+
+    const user = result[0];
+
+    // ============================
+    // ⭐ SITUATION 2 — Manual Signup → Google Login Later
+    // password NOT NULL, email matches
+    // allow login
+    // ============================
+    // DO NOTHING SPECIAL (just login same account)
+
+    // 5. Login same user
+    const access_Token = setAccessTokenCookies(res, { userId: user.id });
+    const refresh_Token = setRefreshTokenCookie(res, { userId: user.id });
+
+    const hashedRefreshToken = await argon2.hash(refresh_Token);
+    const userAgent = req.headers["user-agent"] || null;
+
+    await insertUserSessionRecord(
+      user.id,
+      hashedRefreshToken,
+      userAgent,
+      req.clientIp
+    );
+
+    return res.json({
+      success: true,
+      message: "Google login successful",
+    });
+
+  } catch (err) {
+    console.error("Google Login Error:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Google login failed" });
   }
 }

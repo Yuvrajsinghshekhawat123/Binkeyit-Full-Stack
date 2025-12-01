@@ -10,11 +10,67 @@ import {
   FaCheckCircle,
   FaTimesCircle,
 } from "react-icons/fa";
+import { useFedexTrackOrder } from "../../../03-features/order/hook/04-useTrackOrder";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDeleteOrderByProductId } from "../../../03-features/order/hook/05-useDeleteOrderByProductId";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function Myorders() {
-  const { data: orders, isLoading, isError, error } = useGetAllOrdersDetails();
+  const { data: orders, isLoading, isError, error,isFetching  } = useGetAllOrdersDetails();
+  
 
-  // Function to get status color and icon
+  useEffect(() => {
+  queryClient.invalidateQueries({ queryKey: ["allOrders"] });
+}, []);
+
+
+  const { mutate: track } = useFedexTrackOrder();
+  const navigate = useNavigate(); // ⭐ FIX
+  const [trackingKey, setTrackingKey] = useState(null);
+
+  const [cancelProductId, setCancelProductId] = useState(null);
+  const { mutate: deleteProduct } = useDeleteOrderByProductId();
+  const queryClient = useQueryClient();
+
+  async function handleDeleteOrderProductById(productId, orderId) {
+    setCancelProductId(productId);
+    const formData = new FormData();
+    formData.append("orderId", orderId);
+    formData.append("productId", productId);
+
+    deleteProduct(formData, {
+      onSuccess: async (data) => {
+        toast.success(data.message);
+        await queryClient.invalidateQueries({ queryKey: ["allOrders"] });
+        setCancelProductId(null);
+      },
+
+      onError: (error) => {
+        setCancelProductId(null);
+        toast.error(error?.response?.data?.message || "Something went wrong!");
+      },
+    });
+  }
+
+  function handleFedextrackOrder(uniqueKey) {
+    setTrackingKey(uniqueKey);
+
+    const formData = new FormData();
+    formData.append("awb", "231300687629630");
+
+    track(formData, {
+      onSuccess: (trackingDetails) => {
+        setTrackingKey(null);
+        navigate("/tracking-order", { state: { trackingDetails } });
+      },
+      onError: (err) => {
+        setTrackingKey(null);
+        toast.error("Tracking failed");
+      },
+    });
+  }
+
   const getStatusInfo = (status) => {
     switch (status?.toLowerCase()) {
       case "delivered":
@@ -30,7 +86,6 @@ export function Myorders() {
     }
   };
 
-  // Format date
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -49,6 +104,23 @@ export function Myorders() {
       </div>
     );
   }
+  
+  
+  
+  // 2️⃣ Show spinner on REFRESH (invalidateQueries)
+if (isFetching) {
+  return (
+    <div className="flex justify-center items-center min-h-96">
+      <div className="text-center">
+        <ClipLoader color="#2563eb" loading size={50} />
+        <p className="mt-4 text-gray-600">Refreshing orders...</p>
+      </div>
+    </div>
+  );
+}
+
+
+
 
   if (isError) {
     toast.error(error?.message || "Something went wrong");
@@ -65,7 +137,7 @@ export function Myorders() {
         </div>
 
         {orders?.orders?.length > 0 ? (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {orders.orders.map((order) => {
               const StatusIcon = getStatusInfo(order.delivery_status).icon;
               const statusColor = getStatusInfo(order.delivery_status).color;
@@ -73,34 +145,38 @@ export function Myorders() {
               return (
                 <div
                   key={order.id}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md scroll-smooth "
+                  className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all"
                 >
                   {/* Order Header */}
-                  <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+                  <div className="p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div className="flex items-center gap-4">
                         <div className="bg-white rounded-lg p-3 shadow-sm">
                           <FaBox className="w-6 h-6 text-blue-600" />
                         </div>
+
                         <div>
-                          <h2 className="text-lg  font-semibold text-gray-900">
+                          <h2 className="text-lg font-semibold text-gray-900">
                             Order #{order.orderId}
                           </h2>
                           <div className="flex items-center gap-4 mt-1 flex-wrap">
-                             
-                            {/* 🟢 Payment Status */}
+                            {/* Payment Status */}
                             <div
                               className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                                order.payment_status === "Completed"
+                                order.payment_status === "Completed" ||
+                                order.payment_status === "Refunded"
                                   ? "text-green-600 bg-green-50"
                                   : "text-red-600 bg-red-50"
                               }`}
                             >
                               <FaCreditCard className="w-4 h-4" />
-                              {order.payment_status === "Completed"
+
+                              {order.payment_status === "Completed" ||
+                              order.payment_status === "Refunded"
                                 ? "Paid"
                                 : "Unpaid"}
                             </div>
+
                             <div className="flex items-center gap-1 text-gray-500 text-sm">
                               <FaCalendar className="w-4 h-4" />
                               {formatDate(order.createdAt || new Date())}
@@ -121,54 +197,143 @@ export function Myorders() {
                     </div>
                   </div>
 
-                  {/* Products Grid */}
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Order Items
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {order.product_details.map((item, i) => (
+                  {/* EACH PRODUCT LIKE MEESHO */}
+                  <div className="p-6 space-y-4">
+                    {order.product_details.map((item, i) => {
+                      const price = Number(item.Price);
+                      const discount = Number(item.Discount);
+                      const finalPrice = price - (price * discount) / 100;
+                      return (
                         <div
                           key={i}
-                          className="border-2 border-gray-100 rounded-xl p-4 transition-all duration-300 hover:border-blue-200 hover:shadow-sm group"
+                          className="border-2 border-gray-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-all"
                         >
-                          <div className="aspect-square mb-3 bg-gray-50 rounded-lg p-3 flex items-center justify-center">
-                            <img
-                              src={item.Image}
-                              alt={item.Name}
-                              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                            />
-                          </div>
-                          <p className="font-medium text-gray-900 text-center line-clamp-2 group-hover:text-blue-600 transition-colors">
-                            {item.Name}
-                          </p>
-                          {item.Quantity && (
-                            <p className="text-sm text-gray-500 text-center mt-2">
-                              Qty: {item.Quantity}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                          <div className="flex gap-4">
+                            {/* Product Image */}
+                            <div className="w-28 h-28 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden">
+                              <img
+                                src={item.image}
+                                alt={item.Name}
+                                className="object-contain w-full h-full"
+                              />
+                            </div>
 
-                  {/* Order Actions */}
-                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-                    <div className="flex flex-col sm:flex-row gap-3 justify-end">
-                      <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        Track Order
-                      </button>
-                      <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
-                        View Details
-                      </button>
-                    </div>
+                            {/* PRODUCT DETAILS */}
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-900 text-lg">
+                                {item.Name}
+                              </p>
+
+                              <p className="text-gray-500 mt-1">
+                                Qty: {item.Quantity}
+                              </p>
+
+                              {/* CANCELLED BADGE */}
+                              {item.isCancelled ? (
+                                <>
+                                  {/* CANCELLED BADGE */}
+                                  <div className="inline-flex items-center gap-2 mt-3 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-600">
+                                    <FaTimesCircle className="w-4 h-4" />
+                                    Cancelled
+                                  </div>
+
+                                  {/* REFUND MESSAGE — ADD THIS */}
+                                  {item.refundStatus!="Pending" &&  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <p className="text-yellow-700 font-semibold">
+                                      Refund initiated
+                                    </p>
+                                    <p className="text-sm text-yellow-700">
+                                      Amount will be credited within{" "}
+                                      <span className="font-medium">
+                                        7 working days
+                                      </span>
+                                      .
+                                    </p>
+                                  </div>
+
+                                  }
+                                </>
+                              ) : (
+                                <div
+                                  className={`inline-flex items-center gap-2 mt-3 px-3 py-1 rounded-full text-sm font-medium ${statusColor}`}
+                                >
+                                  <StatusIcon className="w-4 h-4" />
+                                  {order.delivery_status}
+                                </div>
+                              )}
+
+                              {/* Refund Status */}
+                              {item.isCancelled && item.refundStatus!="Pending" && (
+                                <p className="mt-2 text-sm text-gray-600">
+                                  Refund Status:{" "}
+                                  <span className="font-medium">
+                                    {item.refundStatus}
+                                  </span>
+                                </p>
+                              )}
+
+                              {/* PRICE */}
+                              <p className="mt-3 text-xl font-semibold text-gray-900">
+                                ₹{finalPrice.toFixed(2)}
+                              </p>
+
+                              {/* Buttons */}
+                              {!item.isCancelled && (
+                                <div className="flex gap-3 mt-4">
+                                  <button
+                                    onClick={() =>
+                                      handleFedextrackOrder(
+                                        `${order.orderId}-${i}`
+                                      )
+                                    }
+                                    className="px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-lg hover:bg-gray-100 cursor-pointer"
+                                  >
+                                    {trackingKey === `${order.orderId}-${i}` ? (
+                                      <div className="flex justify-center items-center gap-2">
+                                        <ClipLoader
+                                          color="black"
+                                          loading
+                                          size={22}
+                                        />
+                                        <span>Tracking...</span>
+                                      </div>
+                                    ) : (
+                                      "Track Order"
+                                    )}
+                                  </button>
+
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteOrderProductById(
+                                        item.ProductId,
+                                        order.orderId
+                                      )
+                                    }
+                                    className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer"
+                                  >
+                                    {cancelProductId === item.ProductId ? (
+                                      <div className="flex justify-center items-center gap-2">
+                                        <ClipLoader color="white" size={18} />
+                                        <span>Canceling...</span>
+                                      </div>
+                                    ) : (
+                                      "Cancel Item"
+                                    )}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          /* Empty State */
+          // No Orders
           <div className="text-center py-16">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 max-w-md mx-auto">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -178,12 +343,14 @@ export function Myorders() {
                 No orders yet
               </h3>
               <p className="text-gray-600 mb-6">
-                You haven't placed any orders. Start shopping to see your orders
-                here.
+                You haven't placed any orders. Start shopping now!
               </p>
-              <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              <Link
+                to="/"
+                className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
                 Start Shopping
-              </button>
+              </Link>
             </div>
           </div>
         )}

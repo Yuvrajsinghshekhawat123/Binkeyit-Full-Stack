@@ -1,5 +1,5 @@
 import express from "express";
-import { ChangePassword, DeleteAvatar, forgotPassword, LoginUser, LoginUserDetails, logout, registerUser, ResendCode, ResendResetPasswordCode, resetPassword, updateUserDetails, uploadAvatar, verifiyEmail, verify_Reset_Password_OTP, verifyEmailChange } from "../03-controllers/01-users.js";
+import { ChangePassword, DeleteAvatar, forgotPassword, googleLogin, LoginUser, LoginUserDetails, logout, registerUser, ResendCode, ResendResetPasswordCode, resetPassword, updateUserDetails, uploadAvatar, verifiyEmail, verify_Reset_Password_OTP, verifyEmailChange } from "../03-controllers/01-users.js";
 import { jwtAuthMiddeware } from "../04-middlewares/jwtAuthMiddelware.js";
 import { upload } from "../04-middlewares/multer.js";
  
@@ -12,6 +12,20 @@ userAuthRouter.post("/verify-email", verifiyEmail);  // checks code, marks verif
 userAuthRouter.post("/resend-Code",ResendCode);
 
 userAuthRouter.post("/login",LoginUser);
+
+
+
+
+
+userAuthRouter.post("/googleLogin",googleLogin);
+
+
+
+
+
+
+
+
 
 
 

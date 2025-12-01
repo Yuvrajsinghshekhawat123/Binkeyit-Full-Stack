@@ -8,7 +8,7 @@ export function ProtectedRoute({ allowedRoles = [], redirectPath = "/" }) {
 
 
   const { userId, role } = useSelector((state) => state.userDetail || {});
-  
+    
 
   // Not logged in → redirect to login
   if (!userId) return <Navigate to={redirectPath} replace />;

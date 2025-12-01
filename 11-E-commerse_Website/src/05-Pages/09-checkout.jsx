@@ -111,6 +111,12 @@ export function Checkout() {
         Quantity: item.count,
         Price: item.price,
         Discount: item.discount,
+        image: item.image,
+
+
+         // NEW FIELDS
+    isCancelled: false,
+    refundStatus: "None"
       })
     );
 
@@ -157,6 +163,10 @@ async function handleOnlinePayment() {
     image: item.image,
     Price: item.price,
     Discount: item.discount,
+
+     // NEW FIELDS
+    isCancelled: false,
+    refundStatus: "None"
   }));
 
    
@@ -170,6 +180,7 @@ async function handleOnlinePayment() {
 
   OnlinePayment(payload, {
     onSuccess: (data) => {
+       dispatch(clearCart());
        
       // Redirect to Stripe-hosted checkout page
        window.location.replace(data.url);

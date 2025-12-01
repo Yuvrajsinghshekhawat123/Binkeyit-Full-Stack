@@ -24,6 +24,10 @@ import { SingleProductPage } from "./05-Pages/08-SingleProductDetail";
 import { Checkout } from "./05-Pages/09-checkout";
 import OrderSuccess from "./05-Pages/10-success";
 
+
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import TrackingOrderPage from "./03-features/order/components/trakingtimeline";
+
 // Move this OUTSIDE the App component
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -73,54 +77,54 @@ export default function App() {
         { path: "/forgot-password", element: <Forgotpassword /> },
         { path: "/verify-otp", element: <VerifyForgotPasswordOTP /> },
         { path: "/reset-Password", element: <ResetPassword /> },
-        {path:"/checkout",element:<Checkout/>},
-         {path:"/success",element:<OrderSuccess/>},
-        {path:"/prn/:productName/prid/:productId",element:<SingleProductPage/>},
-        {path:"/products/:category/:subcategory", element:<ProductListpage/>}
+        { path: "/checkout", element: <Checkout /> },
+        { path: "/success", element: <OrderSuccess /> },
+        { path: "/tracking-order", element: <TrackingOrderPage /> },
+
+        {
+          path: "/prn/:productName/prid/:productId",
+          element: <SingleProductPage />,
+        },
+        {
+          path: "/products/:category/:subcategory",
+          element: <ProductListpage />,
+        },
       ],
     },
 
-
-
-
-
-
-
     // Shared routes accessible by all routes
-{
-  element: <ProtectedRoute allowedRoles={["admin", "user"]} />,
-  children: [
-    { path: "/account/profile", element: <Dashboard /> },
-  ],
-},
-
+    {
+      element: <ProtectedRoute allowedRoles={["admin", "user"]} />,
+      children: [{ path: "/account/profile", element: <Dashboard /> }],
+    },
 
     // Protected section
     // Admin protected routes
-  {
-    element: <ProtectedRoute allowedRoles={["admin"]} />,
-    children: [{ path: "/account/admin/*", element: <Dashboard /> }],
-  },
+    {
+      element: <ProtectedRoute allowedRoles={["admin"]} />,
+      children: [{ path: "/account/admin/*", element: <Dashboard /> }],
+    },
 
-  // Non-admin protected routes
-  {
-    element: <ProtectedRoute allowedRoles={["user"]} />,
-    children: [{ path: "/account/*", element: <Dashboard /> }],
-  },
+    // Non-admin protected routes
+    {
+      element: <ProtectedRoute allowedRoles={["user"]} />,
+      children: [{ path: "/account/*", element: <Dashboard /> }],
+    },
   ]);
 
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        {/* ✅ Place ToastContainer here so it's globally available */}
-        <ToastContainer position="top-right" autoClose={3000} />
-        <SessionProvider>
-          <RouterProvider router={router} />
-        </SessionProvider>
-      </QueryClientProvider>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <QueryClientProvider client={queryClient}>
+          <ToastContainer position="top-center" autoClose={3000} />
+          <SessionProvider>
+            <RouterProvider router={router} />
+          </SessionProvider>
+        </QueryClientProvider>
+      </GoogleOAuthProvider>
     </>
   );
-}     
+}
 
 /*
 How to trigger a toast in any component:

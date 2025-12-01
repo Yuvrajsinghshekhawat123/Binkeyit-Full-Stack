@@ -4,12 +4,12 @@ const stripe = Stripe(process.env.Secret_key);
 
 import { v4 as uuidv4 } from "uuid";
 import {
+  deleteOrderedProductByProductId,
   getOrderDetailsById,
   insertDataOfCOD,
   insertDataOfOnlinePayment,
 } from "../02-models/06-order.js";
 import { emptyCartProductTable } from "../02-models/03-cartPorduct.js";
-import { getAddressById } from "../02-models/02-address.js";
 import { json } from "zod";
 export async function COD(req, res) {
   try {
@@ -68,6 +68,9 @@ export async function onlinePayment(req, res) {
         product_data: {
           name: item.Name,
           images: [item.image],
+           metadata: {
+        Discount: item.Discount,           // ⭐ SENDING DISCOUNT TO STRIPE
+      },
         },
         unit_amount: Math.round(item.Price * 100), // in paise
       },
@@ -135,10 +138,17 @@ export async function webhookStripe(request, response) {
             Name: item.description,
             Quantity: item.quantity,
             amount_total: item.amount_total,
+            Price: item.price.unit_amount / 100,  
+            Discount: product.metadata.Discount || 0, 
             currency: item.currency,
             price_id: item.price.id,
             ProductId: item.price.product,
-            Image: product.images?.[0] || null, // ✅ safe access
+            image: product.images?.[0] || null, // ✅ safe access
+
+
+             // ADD THESE TWO FIELDS
+            isCancelled: false,
+            refundStatus: "None",
           };
         })
       );
@@ -193,15 +203,38 @@ export async function getOrderDetails(req, res) {
 
 
 
-[
-  {
-    Name: "Baby Clothing Set",
-    Image:
-      "http://res.cloudinary.com/dgmfti7ms/image/upload/v1759927400/Products/cucfhqhi4ddq1bqyzj00.png",
-    Quantity: 1,
-    currency: "inr",
-    price_id: "price_1SMjbhCRW6iXXpbIGqxu9sQr",
-    ProductId: "prod_TIy0x159WbEtqs",
-    amount_total: 20000,
-  },
-];
+ 
+
+export async function  deleteOrder(req,res) {
+  try{
+
+    const {productId,orderId}=req.body;
+    const userId = req.userId;
+
+
+     // Validate input
+    if (!productId || !orderId) {
+      return res.status(400).json({
+        success: false,
+        message: "productId and orderId are required.",
+      });
+    }
+
+        // Call the service logic
+    const result = await deleteOrderedProductByProductId(orderId, productId);
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+    });
+
+    
+
+
+  }catch(err){
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+}

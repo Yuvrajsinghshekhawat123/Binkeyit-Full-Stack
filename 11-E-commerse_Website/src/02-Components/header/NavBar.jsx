@@ -235,52 +235,52 @@ export function NavBar() {
                     {userDetail?.role === "user" ? (
                       <>
                         <div className="w-full text-gray-600 font-normal p-2">
-                          <button
+                          <Link to="/account/orders"
                             onClick={() => setOpenUserManu(false)}
-                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left block"
                           >
-                            <Link to="/account/orders">My Orders</Link>
-                          </button>
+                          My Orders
+                          </Link>
                         </div>
                         <div className="w-full text-gray-600 font-normal p-2">
-                          <button
+                          <Link to="/account/addresses"
                             onClick={() => setOpenUserManu(false)}
-                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left block"
                           >
-                            <Link to="/account/addresses">Saved Addresses</Link>
-                          </button>
+                             Saved Addresses
+                          </Link>
                         </div>
                       </>
                     ) : (
                       <>
                         <div className="w-full text-gray-600 font-normal p-2">
-                          <button
+                          <Link to="/account/admin/category"
                             onClick={() => setOpenUserManu(false)}
-                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left block"
                           >
-                            <Link to="/account/admin/category">Category</Link>
-                          </button>
+                             Category 
+                          </Link>
                         </div>
                         <div className="w-full text-gray-600 font-normal p-2">
-                          <button
+                          <Link to="/account/admin/sub-category"
                             onClick={() => setOpenUserManu(false)}
-                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left block"
                           >
-                            <Link to="/account/admin/sub-category">
+                            
                               Sub Category
-                            </Link>
-                          </button>
+                             
+                          </Link>
                         </div>
 
                         <div className="w-full text-gray-600 font-normal p-2">
-                          <button
+                          <Link to="/account/admin/upload-products"
                             onClick={() => setOpenUserManu(false)}
-                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left"
+                            className="hover:bg-gray-200 hover:text-blue-600 cursor-pointer w-full text-left block"
                           >
-                            <Link to="/account/admin/upload-products">
+                            
                               Upload Products
-                            </Link>
-                          </button>
+                            
+                          </Link>
                         </div>
                       </>
                     )}
