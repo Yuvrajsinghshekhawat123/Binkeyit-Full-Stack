@@ -25,14 +25,16 @@ export function GoogleLoginButton() {
     sendGoogleToken(
       { code: authResult.code },
       {
-        onSuccess: async () => {
+        onSuccess: async (data) => {
           try {
+            toast.success(data.message);
             await queryClient.invalidateQueries({ queryKey: ["userDetails"] });
 
             await queryClient.refetchQueries({
               queryKey: ["userDetails"],
               exact: true,
             });
+             
 
             navigate("/", { replace: true });
           } catch (err) {

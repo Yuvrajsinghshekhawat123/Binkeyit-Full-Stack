@@ -1,30 +1,28 @@
-import mysql2 from "mysql2/promise";
+ import mysql from "mysql2/promise";
 
-let db=null;
-
+let db = null;
 
 export async function connectDB() {
-    try{
-         db=await mysql2.createConnection({
-            host:"localhost",
-            user:"root",
-            password:"123240",
-            database:"e-commerse"
-        });
+  try {
+    db = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      port: process.env.DB_PORT || 3306
+    });
 
-        console.log("MySql connected successfully")
-    }catch(err){
-        console.error("Failed to connect to DB:", err);
-    }
+    console.log("✅ MySQL connected successfully");
+  } catch (err) {
+    console.error("❌ Failed to connect to DB:", err);
+    process.exit(1);
+  }
 }
 
-
-
-export function getDB(){
-    if(!db) throw new Error("DB not initialized");
-    return db;
+export function getDB() {
+  if (!db) throw new Error("DB not initialized");
+  return db;
 }
-
 
 
 

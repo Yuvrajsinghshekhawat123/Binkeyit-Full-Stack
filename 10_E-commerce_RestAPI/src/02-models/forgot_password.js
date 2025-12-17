@@ -12,6 +12,7 @@ export async function savePasswordVerificationToken(userId,token) {
 
 
  //  Clean up verification row
+
 export async function deleteOtpWhenError(userId) {
     const db = getDB();
     await db.execute(
@@ -19,8 +20,6 @@ export async function deleteOtpWhenError(userId) {
         [userId]
     );
 }
-
-
 // get data
 export async function findResetPasswordUser(userId) {
     const db = getDB();

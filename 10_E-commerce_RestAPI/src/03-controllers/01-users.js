@@ -413,8 +413,6 @@ export async function updateUserDetails(req, res) {
     if (email && email !== oldUser.email) {
       const token = crypto.randomInt(100000, 999999).toString();
       const hashedToken = await argon2.hash(token);
-      console.log("hihhhhhhhhhh");
-
       await insertEmailVerification(
         updatedUser.name,
         email,
@@ -638,7 +636,6 @@ export async function verify_Reset_Password_OTP(req, res) {
 }
 
 // resend ResetPassword code
-
 export async function ResendResetPasswordCode(req, res) {
   try {
     const { email } = req.body;
