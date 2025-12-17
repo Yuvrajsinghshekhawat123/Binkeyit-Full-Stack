@@ -20,7 +20,7 @@ app.use(cookieParser()); // Must come before session
 
 // Enable CORS
 app.use(cors({
-    origin: "http://localhost:5173", // your frontend URL
+    origin: process.env.FRONTEND_URL, // your frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
