@@ -6,8 +6,8 @@ export  function setAccessTokenCookies(res,payload) {
 
     res.cookie("access_Token",access_Token,{
         httpOnly:true,
-        secure: process.env.NODE_ENV === "production", // only over HTTPS in production,
-         sameSite: "Lax", // "strict" blocks cross-origin, so use "none"
+           secure: process.env.NODE_ENV === "production", // ✅ required
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
          maxAge: 5* 60 * 1000  // 5 minutes
     });
 
@@ -22,8 +22,8 @@ export  function setRefreshTokenCookie(res,payload) {
 
     res.cookie("refresh_Token", refresh_Token,{
         httpOnly:true,
-        secure: process.env.NODE_ENV === "production", // only over HTTPS in production,
-         sameSite: "Lax", // "strict" blocks cross-origin, so use "none"
+        secure: process.env.NODE_ENV === "production", // ✅ HTTPS only in prod
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
          maxAge:  24 * 60 * 60 * 1000 // 1 day in ms  , Cookie expires in 24h , JWT itself expires in 20h
     });
 
